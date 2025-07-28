@@ -23,10 +23,18 @@ protocol MainViewModelProtocol {
 
     /// LLM 演示按钮点击
     func llmDemoButtonTapped(viewController: UIViewController)
+
+    /// AI 能力组合演示按钮点击
+    func aiCapabilityButtonTapped(viewController: UIViewController)
+
+    /// 智慧教育场景按钮点击
+    func educationScenarioButtonTapped(viewController: UIViewController)
 }
 
 /// MainViewModel 导航代理协议
 protocol MainViewModelNavigationDelegate: AnyObject {
     func navigateToProductDetail()
     func navigateToLLMDemo()
+    func navigateToAICapabilityDemo()
+    func navigateToEducationScenario()
 }
