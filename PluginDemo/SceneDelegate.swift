@@ -10,24 +10,40 @@ import UIKit
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     var window: UIWindow?
-
+    private var mainCoordinator: MainCoordinatorProtocol?
 
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
-        // Use this method to optionally configure and attach the UIWindow `window` to the provided UIWindowScene `scene`.
-        // If using a storyboard, the `window` property will automatically be initialized and attached to the scene.
-        // This delegate does not imply the connecting scene or session are new (see `application:configurationForConnectingSceneSession` instead).
-        guard let _ = (scene as? UIWindowScene) else { return }
-        
+        guard let windowScene = (scene as? UIWindowScene) else { return }
+
+        // 设置窗口
+        window = UIWindow(windowScene: windowScene)
+
+        // 初始化依赖注入容器
+        let diContainer = DIContainer.shared
+
         // 组装我们的追踪系统
         let tracker = UserActionTracker.shared
 
         // 注册插件 - 顺序很重要！
         // ABTestPlugin 需要先注册，因为它在 transform 阶段为事件添加实验组信息
-        tracker.register(plugin: ABTestPlugin())
-        tracker.register(plugin: FirebaseAnalyticsPlugin())
-        tracker.register(plugin: AppsFlyerPlugin())
+        if let abTestPlugin = diContainer.resolve(ActionTrackerPlugin.self, name: "abtest") {
+            tracker.register(plugin: abTestPlugin)
+        }
+        if let firebasePlugin = diContainer.resolve(ActionTrackerPlugin.self, name: "firebase") {
+            tracker.register(plugin: firebasePlugin)
+        }
+        if let appsFlyerPlugin = diContainer.resolve(ActionTrackerPlugin.self, name: "appsflyer") {
+            tracker.register(plugin: appsFlyerPlugin)
+        }
 
         print("UserActionTracker: All plugins registered successfully")
+
+        // 启动主 Coordinator
+        mainCoordinator = diContainer.resolve(MainCoordinatorProtocol.self)
+        window?.rootViewController = mainCoordinator?.navigationController
+        mainCoordinator?.start()
+
+        window?.makeKeyAndVisible()
     }
 
     func sceneDidDisconnect(_ scene: UIScene) {
