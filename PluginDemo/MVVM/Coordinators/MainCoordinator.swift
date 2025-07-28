@@ -10,22 +10,32 @@ import Swinject
 
 /// 主页面 Coordinator
 final class MainCoordinator: MainCoordinatorProtocol {
-    
+
     // MARK: - Properties
-    
+
     let navigationController: UINavigationController
+    var childCoordinators: [CoordinatorProtocol] = []
+    weak var parentCoordinator: CoordinatorProtocol?
+
     private let container: Container
-    
+
     // MARK: - Initialization
-    
+
     init(container: Container, navigationController: UINavigationController = UINavigationController()) {
         self.container = container
         self.navigationController = navigationController
+        print("🏗️ MainCoordinator: 初始化完成")
     }
-    
+
+    deinit {
+        print("🗑️ MainCoordinator: 已释放")
+    }
+
     // MARK: - CoordinatorProtocol
 
     func start() {
+        print("🚀 MainCoordinator: 开始启动...")
+
         let viewModel = container.resolve(MainViewModelProtocol.self)!
         let viewController = MainViewController(viewModel: viewModel)
 
@@ -35,6 +45,8 @@ final class MainCoordinator: MainCoordinatorProtocol {
         }
 
         navigationController.setViewControllers([viewController], animated: false)
+
+        print("✅ MainCoordinator: 启动完成")
     }
     
     // MARK: - MainCoordinatorProtocol
@@ -74,5 +86,15 @@ extension MainCoordinator: MainViewModelNavigationDelegate {
     func navigateToLLMDemo() {
         let llmDemoVC = LLMDemoViewController()
         navigationController.pushViewController(llmDemoVC, animated: true)
+    }
+
+    func navigateToAICapabilityDemo() {
+        let aiCapabilityVC = AICapabilityDemoViewController()
+        navigationController.pushViewController(aiCapabilityVC, animated: true)
+    }
+
+    func navigateToEducationScenario() {
+        let educationVC = EducationScenarioDemoViewController()
+        navigationController.pushViewController(educationVC, animated: true)
     }
 }

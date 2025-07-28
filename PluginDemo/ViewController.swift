@@ -49,10 +49,33 @@ final class MainViewController: UIViewController {
         return btn
     }()
 
+    private lazy var aiCapabilityButton: UIButton = {
+        let btn = UIButton()
+        btn.setTitle("AI 能力组合演示", for: .normal)
+        btn.backgroundColor = .systemTeal
+        btn.layer.cornerRadius = 8
+        return btn
+    }()
+
+    private lazy var educationScenarioButton: UIButton = {
+        let btn = UIButton()
+        btn.setTitle("智慧教育场景", for: .normal)
+        btn.backgroundColor = .systemIndigo
+        btn.layer.cornerRadius = 8
+        return btn
+    }()
+
     private lazy var stackView: UIStackView = {
-        let stack = UIStackView(arrangedSubviews: [purchaseButton, viewScreenButton, customEventButton, llmDemoButton])
+        let stack = UIStackView(arrangedSubviews: [
+            purchaseButton,
+            viewScreenButton,
+            customEventButton,
+            llmDemoButton,
+            aiCapabilityButton,
+            educationScenarioButton
+        ])
         stack.axis = .vertical
-        stack.spacing = 20
+        stack.spacing = 16
         stack.distribution = .fillEqually
         return stack
     }()
@@ -89,8 +112,8 @@ final class MainViewController: UIViewController {
 
         stackView.centerXAnchor == view.centerXAnchor
         stackView.centerYAnchor == view.centerYAnchor
-        stackView.widthAnchor == 250
-        stackView.heightAnchor == 280
+        stackView.widthAnchor == 280
+        stackView.heightAnchor == 400
     }
 
     private func setupActions() {
@@ -98,6 +121,8 @@ final class MainViewController: UIViewController {
         viewScreenButton.addTarget(self, action: #selector(viewScreenAction), for: .touchUpInside)
         customEventButton.addTarget(self, action: #selector(customEventAction), for: .touchUpInside)
         llmDemoButton.addTarget(self, action: #selector(llmDemoAction), for: .touchUpInside)
+        aiCapabilityButton.addTarget(self, action: #selector(aiCapabilityAction), for: .touchUpInside)
+        educationScenarioButton.addTarget(self, action: #selector(educationScenarioAction), for: .touchUpInside)
     }
 
     // MARK: - Actions
@@ -116,6 +141,14 @@ final class MainViewController: UIViewController {
 
     @objc private func llmDemoAction() {
         viewModel.llmDemoButtonTapped(viewController: self)
+    }
+
+    @objc private func aiCapabilityAction() {
+        viewModel.aiCapabilityButtonTapped(viewController: self)
+    }
+
+    @objc private func educationScenarioAction() {
+        viewModel.educationScenarioButtonTapped(viewController: self)
     }
 }
 

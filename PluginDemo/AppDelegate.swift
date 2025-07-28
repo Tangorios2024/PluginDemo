@@ -14,6 +14,16 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
+
+        // 在后台运行插件架构演示
+        Task {
+            // 运行快速测试验证功能
+            await AICapabilityTest.runQuickTest()
+
+            // 运行完整演示
+            await AICapabilityDemo.runCompleteDemo()
+        }
+
         return true
     }
 

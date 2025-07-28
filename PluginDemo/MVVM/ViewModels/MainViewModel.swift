@@ -90,4 +90,45 @@ final class MainViewModel: MainViewModelProtocol {
         // 通知导航代理进行页面跳转
         navigationDelegate?.navigateToLLMDemo()
     }
+
+    func aiCapabilityButtonTapped(viewController: UIViewController) {
+        // 追踪按钮点击
+        tracker.track(.tapButton(identifier: "ai_capability_button"),
+                     from: viewController,
+                     userId: currentUserId)
+
+        // 追踪AI能力演示事件
+        let properties = [
+            "demo_type": "ai_capability_combination",
+            "source": "main_screen",
+            "feature": "ai_demo"
+        ]
+        tracker.track(.custom(name: "ai_capability_demo_started", properties: properties),
+                     from: viewController,
+                     userId: currentUserId)
+
+        // 通知导航代理进行页面跳转
+        navigationDelegate?.navigateToAICapabilityDemo()
+    }
+
+    func educationScenarioButtonTapped(viewController: UIViewController) {
+        // 追踪按钮点击
+        tracker.track(.tapButton(identifier: "education_scenario_button"),
+                     from: viewController,
+                     userId: currentUserId)
+
+        // 追踪教育场景演示事件
+        let properties: [String: Any] = [
+            "demo_type": "education_scenario",
+            "scenarios": ["smart_learning_assistant", "interactive_storytelling"],
+            "source": "main_screen",
+            "feature": "education_demo"
+        ]
+        tracker.track(.custom(name: "education_scenario_demo_started", properties: properties),
+                     from: viewController,
+                     userId: currentUserId)
+
+        // 通知导航代理进行页面跳转
+        navigationDelegate?.navigateToEducationScenario()
+    }
 }
