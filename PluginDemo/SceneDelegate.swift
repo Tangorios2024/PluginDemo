@@ -20,10 +20,14 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         
         // 组装我们的追踪系统
         let tracker = UserActionTracker.shared
+
+        // 注册插件 - 顺序很重要！
+        // ABTestPlugin 需要先注册，因为它在 transform 阶段为事件添加实验组信息
+        tracker.register(plugin: ABTestPlugin())
         tracker.register(plugin: FirebaseAnalyticsPlugin())
         tracker.register(plugin: AppsFlyerPlugin())
-        // 如果未来需要 A/B 测试，只需再加一行
-        // tracker.register(plugin: ABTestingPlugin())
+
+        print("UserActionTracker: All plugins registered successfully")
     }
 
     func sceneDidDisconnect(_ scene: UIScene) {

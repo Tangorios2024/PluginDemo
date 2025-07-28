@@ -28,15 +28,25 @@ final class UserActionTracker {
     }
 
     // 核心分发方法 (扩展点)
-    func track(_ action: UserAction, from viewController: UIViewController? = nil) {
-        let context = ActionContext(sourceViewController: viewController)
-        
+    func track(_ action: UserAction, from viewController: UIViewController? = nil, userId: String? = nil) {
+        let context = ActionContext(userId: userId, sourceViewController: viewController)
+
         print("ActionTracker: Tracking action \(action)")
-        
+
+        // 第一阶段：事件转换 (Transform Phase)
+        var transformedAction = action
         for plugin in plugins {
-            // 在扩展点调用插件
-            if plugin.shouldTrack(action: action) {
-                plugin.track(action: action, context: context)
+            if plugin.shouldTrack(action: transformedAction, context: context) {
+                transformedAction = plugin.transform(action: transformedAction, context: context)
+            }
+        }
+
+        print("ActionTracker: Transformed action \(transformedAction)")
+
+        // 第二阶段：事件处理 (Track Phase)
+        for plugin in plugins {
+            if plugin.shouldTrack(action: transformedAction, context: context) {
+                plugin.track(action: transformedAction, context: context)
             }
         }
     }

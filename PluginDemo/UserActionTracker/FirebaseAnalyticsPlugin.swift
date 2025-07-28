@@ -12,18 +12,18 @@ class FirebaseAnalyticsPlugin: ActionTrackerPlugin {
 
     func track(action: UserAction, context: ActionContext) {
         switch action {
-        case .purchase(let itemId, let price):
+        case .purchase(let productId, let value):
             // Analytics.logEvent(AnalyticsEventPurchase, parameters: [...])
-            print("FirebasePlugin: Logged purchase for item \(itemId) with price \(price)")
-        case .share(let contentId, let platform):
-            // Analytics.logEvent(AnalyticsEventShare, parameters: [...])
-            print("FirebasePlugin: Logged share for content \(contentId) on \(platform)")
-        case .viewScreen(let screenName):
+            print("FirebasePlugin: Logged purchase for product \(productId) with value \(value) at \(context.timestamp)")
+        case .tapButton(let identifier):
+            // Analytics.logEvent("button_tap", parameters: [...])
+            print("FirebasePlugin: Logged button tap for \(identifier)")
+        case .viewScreen(let name):
             // Analytics.logEvent(AnalyticsEventScreenView, parameters: [...])
-            print("FirebasePlugin: Logged screen view for \(screenName)")
-        case .custom(let name, let parameters):
-            // Analytics.logEvent(name, parameters: parameters)
-            print("FirebasePlugin: Logged custom event '\(name)', parameters: '\(parameters)'")
+            print("FirebasePlugin: Logged screen view for \(name)")
+        case .custom(let name, let properties):
+            // Analytics.logEvent(name, parameters: properties)
+            print("FirebasePlugin: Logged custom event '\(name)', properties: '\(properties)'")
         }
     }
 }
