@@ -66,6 +66,11 @@ enum AICapabilityType: String, CaseIterable {
     case dialogueInteraction = "dialogue_interaction"         // 对话交互
     case storyGeneration = "story_generation"                 // 故事生成
     
+    // 即时通信场景新增能力
+    case chatDialogue = "chat_dialogue"                       // 聊天对话
+    case documentAnalysis = "document_analysis"               // 文档分析
+    case knowledgeBaseQuery = "knowledge_base_query"          // 知识库查询
+    
     var displayName: String {
         switch self {
         case .mathProblemGeneration: return "数学出题"
@@ -84,6 +89,9 @@ enum AICapabilityType: String, CaseIterable {
         case .tts: return "文本转语音"
         case .dialogueInteraction: return "对话交互"
         case .storyGeneration: return "故事生成"
+        case .chatDialogue: return "聊天对话"
+        case .documentAnalysis: return "文档分析"
+        case .knowledgeBaseQuery: return "知识库查询"
         }
     }
 }
@@ -202,5 +210,24 @@ struct BusinessConfiguration {
         self.enabledCapabilities = enabledCapabilities
         self.quotaLimits = quotaLimits
         self.customParameters = customParameters
+    }
+}
+
+// MARK: - 业务方专用插件协议
+
+/// 业务方专用插件协议 - 用于标识为特定业务方定制的插件
+protocol BusinessSpecificPlugin: AICapabilityPlugin {
+    /// 目标业务方ID
+    var targetBusinessId: String { get }
+    
+    /// 业务方特定的配置参数
+    var businessSpecificConfig: [String: Any] { get }
+}
+
+// MARK: - 业务方专用插件默认实现
+
+extension BusinessSpecificPlugin {
+    var businessSpecificConfig: [String: Any] {
+        return [:]
     }
 }

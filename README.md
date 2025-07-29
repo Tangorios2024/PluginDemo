@@ -158,6 +158,38 @@ class CustomLLMPlugin: LLMPlugin {
 pipeline.register(plugin: CustomLLMPlugin())
 ```
 
+### 添加新的业务方专用插件
+
+```swift
+class CustomBusinessPlugin: BusinessSpecificPlugin {
+    let pluginId = "com.custom.business"
+    let displayName = "自定义业务插件"
+    let supportedCapabilities: [AICapabilityType] = [.deepThinking]
+    let priority = 1
+    let targetBusinessId = "custom_business"
+    
+    var businessSpecificConfig: [String: Any] {
+        return [
+            "custom_feature": "special_analysis",
+            "brand_name": "CustomBrand"
+        ]
+    }
+    
+    func execute(request: AICapabilityRequest) async throws -> AICapabilityResponse {
+        // 自定义业务逻辑
+        return AICapabilityResponse(
+            requestId: request.requestId,
+            capabilityType: request.capabilityType,
+            output: .text("自定义业务分析结果"),
+            metadata: ["custom_feature": true]
+        )
+    }
+}
+
+// 注册插件
+AICapabilityManager.shared.register(plugin: CustomBusinessPlugin())
+```
+
 ## 测试
 
 项目包含完整的测试代码，验证：
@@ -284,11 +316,26 @@ pipeline.register(plugin: CustomLLMPlugin())
 - **启用能力**: 文本摘要、翻译、网络搜索、OCR
 - **配额限制**: 基础套餐，有使用次数限制
 
+#### 5. 即时通信业务方A（新增场景）
+- **启用能力**: 聊天对话、网络搜索、深度思考
+- **能力组合**: 聊天对话 → 网络搜索 → 深度思考（智能对话增强分析）
+- **定制特色**: 带品牌logo的深度思考，品牌化分析报告
+
+#### 6. 即时通信业务方B（新增场景）
+- **启用能力**: 聊天对话、文档分析、深度思考
+- **能力组合**: 聊天对话 → 文档分析 → 深度思考（知识库增强的智能分析）
+- **定制特色**: 连接知识库的深度思考，基于历史数据的分析
+
 ### 🔧 技术特性
 
 #### 插件竞争机制
 - 多个插件可以支持同一种能力（如 NetworkCapabilityPlugin 和 MultimediaCapabilityPlugin 都支持视频通话）
 - 通过优先级自动选择最合适的插件
+
+#### 业务方专用插件
+- 通过 `BusinessSpecificPlugin` 协议实现业务隔离
+- 支持业务方特定的配置参数和定制化功能
+- 自动根据业务方ID选择专用插件实现
 
 #### 动态能力发现
 - 自动发现业务方可用的能力
@@ -328,15 +375,42 @@ pipeline.register(plugin: CustomLLMPlugin())
 🔄 执行步骤：语音合成
    🎭 AdvancedTTSPlugin: 开始高级语音合成 (优先级更高)
    ✅ 执行成功 - 处理时间: 1.000秒
+
+💬 即时通信场景演示
+🏢 业务方A 功能演示
+💬 场景1：基础聊天对话
+   💬 用户消息: 你好，我想了解一下人工智能的发展趋势
+   🤖 AI回复: 🤖 AI助手回复：你好，我想了解一下人工智能的发展趋势...
+🤔 场景3：带品牌logo的深度思考
+   🎯 AICapabilityManager: 选择业务方专用插件 com.ai.businessA.deepthinking
+   🤔 BusinessADeepThinkingPlugin: 开始业务方A深度思考分析
+   🏢 品牌标识: 🏢 BusinessA
+   ✅ 执行成功 - 处理时间: 1.200秒
+      🏷️ 品牌标识: BusinessA
+      🏢 品牌logo已包含
+
+🏢 业务方B 功能演示
+📄 场景2：文档分析
+   📄 文档内容: 微服务架构设计指南...
+   📊 分析结果: 📄 文档分析报告...
+🤔 场景3：结合知识库的深度思考
+   🎯 AICapabilityManager: 选择业务方专用插件 com.ai.businessB.deepthinking
+   🤔 BusinessBDeepThinkingPlugin: 开始业务方B深度思考分析
+   📚 连接知识库: https://kb.businessb.com/api
+   🔍 查询知识库...
+   ✅ 执行成功 - 处理时间: 1.500秒
+      🏷️ 品牌标识: BusinessB
+      📚 知识库已连接
 ```
 
 ## 总结
 
-本项目展示了插件式架构在三个不同场景中的应用：
+本项目展示了插件式架构在四个不同场景中的应用：
 
 1. **用户行为追踪系统**: 展示了插件在数据处理管道中的应用
 2. **LLM 处理管道**: 展示了插件在业务流程中的分层处理
 3. **AI 能力组合平台**: 展示了插件在服务组合和业务定制中的应用
+4. **即时通信功能**: 展示了插件在业务定制化和能力复用中的应用
 
 ### 🎓 智慧教育场景亮点
 
@@ -355,4 +429,21 @@ pipeline.register(plugin: CustomLLMPlugin())
 - **业务隔离**: 不同教育场景可独立配置和优化
 - **服务复用**: 基础能力可在多个教育场景中复用
 
-体现了"定义契约，分离关注，动态组合"的核心思想，通过清晰的扩展点设计和面向协议的实现，实现了高度可扩展和可维护的系统架构，特别适合教育场景中复杂的AI能力组合需求。
+### 💬 即时通信场景亮点
+
+**业务定制化：**
+- **业务方A**: 品牌化深度思考，带logo标识和品牌特色
+- **业务方B**: 知识库增强深度思考，连接专属知识库
+- **能力复用**: 基础聊天对话功能在两个业务方间完全复用
+
+**技术特色：**
+- **业务方专用插件**: 通过 `BusinessSpecificPlugin` 协议实现业务隔离
+- **插件竞争机制**: 同一能力类型支持多个不同实现
+- **动态选择**: 根据业务方ID自动选择最合适的插件实现
+
+**架构优势：**
+- **完全解耦**: 不同业务方的定制需求完全独立
+- **易于扩展**: 新增业务方只需实现专用插件
+- **配置灵活**: 支持业务方特定的参数配置
+
+体现了"定义契约，分离关注，动态组合"的核心思想，通过清晰的扩展点设计和面向协议的实现，实现了高度可扩展和可维护的系统架构，特别适合教育场景中复杂的AI能力组合需求和即时通信场景中的业务定制化需求。

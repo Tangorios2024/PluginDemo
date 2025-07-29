@@ -20,6 +20,9 @@ final class AICapabilityDemo {
 
         // 新增：智慧教育专项场景演示
         await EducationScenarioDemo.runEducationScenarios()
+        
+        // 新增：即时通信场景演示
+        await ChatScenarioDemo.runChatScenarios()
 
         await demo.demonstrateCapabilityCombinations()
         demo.showStatistics()
@@ -45,6 +48,12 @@ final class AICapabilityDemo {
         manager.register(plugin: ContentRecommendationPlugin())
         manager.register(plugin: InteractionCapabilityPlugin())
         manager.register(plugin: AdvancedTTSPlugin()) // 高优先级TTS插件
+        
+        // 新增聊天相关插件
+        manager.register(plugin: ChatCapabilityPlugin())
+        manager.register(plugin: BusinessADeepThinkingPlugin()) // 业务方A专用深度思考
+        manager.register(plugin: BusinessBDeepThinkingPlugin()) // 业务方B专用深度思考
+        manager.register(plugin: DocumentAnalysisPlugin())
         
         // 注册不同业务方配置
         print("\n🏢 注册业务方配置...")
@@ -74,7 +83,7 @@ final class AICapabilityDemo {
         manager.register(businessConfiguration: BusinessConfiguration(
             businessId: "enterprise_001",
             businessName: "企业智能办公",
-            enabledCapabilities: AICapabilityType.allCases, // 启用所有能力
+            enabledCapabilities: AICapabilityType.allCases, // 启用所有能力（包括新增的聊天相关能力）
             quotaLimits: [:], // 无限制
             customParameters: ["enterprise_level": "premium", "security_level": "high"]
         ))
@@ -86,6 +95,40 @@ final class AICapabilityDemo {
             enabledCapabilities: [.textSummary, .translation, .webSearch, .ocr],
             quotaLimits: [.textSummary: 10, .translation: 20, .webSearch: 30],
             customParameters: ["user_type": "individual", "subscription": "basic"]
+        ))
+        
+        // 即时通信业务方A - 带品牌logo的深度思考
+        manager.register(businessConfiguration: BusinessConfiguration(
+            businessId: "business_a",
+            businessName: "业务方A",
+            enabledCapabilities: [.chatDialogue, .webSearch, .deepThinking],
+            quotaLimits: [
+                .chatDialogue: 1000,
+                .webSearch: 500,
+                .deepThinking: 200
+            ],
+            customParameters: [
+                "brand_name": "BusinessA",
+                "brand_logo": "🏢",
+                "premium_features": true
+            ]
+        ))
+        
+        // 即时通信业务方B - 连接知识库的深度思考
+        manager.register(businessConfiguration: BusinessConfiguration(
+            businessId: "business_b",
+            businessName: "业务方B",
+            enabledCapabilities: [.chatDialogue, .documentAnalysis, .deepThinking],
+            quotaLimits: [
+                .chatDialogue: 800,
+                .documentAnalysis: 300,
+                .deepThinking: 150
+            ],
+            customParameters: [
+                "brand_name": "BusinessB",
+                "knowledge_base_enabled": true,
+                "document_analysis_enabled": true
+            ]
         ))
         
         print("\n✅ 插件和业务配置注册完成")
@@ -109,6 +152,12 @@ final class AICapabilityDemo {
         
         // 场景4：个人用户 - 日常助手
         await demonstratePersonalScenario()
+        
+        // 场景5：即时通信业务方A - 带品牌logo的深度思考
+        await demonstrateBusinessAScenario()
+        
+        // 场景6：即时通信业务方B - 连接知识库的深度思考
+        await demonstrateBusinessBScenario()
     }
     
     private func demonstrateEducationScenario() async {
@@ -189,6 +238,32 @@ final class AICapabilityDemo {
         }
     }
     
+    private func demonstrateBusinessAScenario() async {
+        print("\n🏢 场景5：业务方A - 带品牌logo的深度思考")
+        print("-" * 30)
+        
+        // 聊天对话 + 网络搜索 + 深度思考组合
+        print("🔄 能力组合：聊天对话 + 网络搜索 + 深度思考")
+        await demonstrateCapabilityCombination(
+            businessId: "business_a",
+            capabilities: [.chatDialogue, .webSearch, .deepThinking],
+            description: "智能对话增强分析"
+        )
+    }
+    
+    private func demonstrateBusinessBScenario() async {
+        print("\n🏢 场景6：业务方B - 连接知识库的深度思考")
+        print("-" * 30)
+        
+        // 聊天对话 + 文档分析 + 深度思考组合
+        print("🔄 能力组合：聊天对话 + 文档分析 + 深度思考")
+        await demonstrateCapabilityCombination(
+            businessId: "business_b",
+            capabilities: [.chatDialogue, .documentAnalysis, .deepThinking],
+            description: "知识库增强的智能分析"
+        )
+    }
+    
     // MARK: - 能力组合演示
     
     private func demonstrateCapabilityCombinations() async {
@@ -196,7 +271,7 @@ final class AICapabilityDemo {
         print("🔗 智能能力组合演示")
         print("=" * 50)
         
-        let businesses = ["edu_001", "content_001", "enterprise_001", "personal_001"]
+        let businesses = ["edu_001", "content_001", "enterprise_001", "personal_001", "business_a", "business_b"]
         
         for businessId in businesses {
             if let config = manager.getBusinessConfiguration(for: businessId) {
@@ -219,6 +294,11 @@ final class AICapabilityDemo {
         print("📋 组合描述：\(description)")
         print("🔧 涉及能力：\(capabilities.map { $0.displayName }.joined(separator: " → "))")
         
+        // 显示业务方信息
+        if let config = manager.getBusinessConfiguration(for: businessId) {
+            print("🏢 业务方：\(config.businessName)")
+        }
+        
         for (index, capability) in capabilities.enumerated() {
             let request = AICapabilityRequest(
                 capabilityType: capability,
@@ -230,6 +310,17 @@ final class AICapabilityDemo {
                 let response = try await manager.execute(request: request, for: businessId)
                 print("   ✅ 步骤\(index + 1) (\(capability.displayName)): 执行成功")
                 print("      处理时间: \(String(format: "%.3f", response.processingTime))秒")
+                
+                // 显示业务方特定的元数据
+                if let brand = response.metadata["brand"] as? String {
+                    print("      🏷️ 品牌标识: \(brand)")
+                }
+                if let knowledgeBaseConnected = response.metadata["knowledge_base_connected"] as? Bool, knowledgeBaseConnected {
+                    print("      📚 知识库已连接")
+                }
+                if let brandLogoIncluded = response.metadata["brand_logo_included"] as? Bool, brandLogoIncluded {
+                    print("      🏢 品牌logo已包含")
+                }
             } catch {
                 print("   ❌ 步骤\(index + 1) (\(capability.displayName)): \(error.localizedDescription)")
             }
@@ -255,8 +346,30 @@ final class AICapabilityDemo {
         print("\n🎯 能力分布：")
         let allPlugins = manager.getAllPlugins()
         for plugin in allPlugins {
-            print("   \(plugin.displayName): \(plugin.supportedCapabilities.map { $0.displayName }.joined(separator: ", "))")
+            let capabilityNames = plugin.supportedCapabilities.map { $0.displayName }.joined(separator: ", ")
+            if let businessPlugin = plugin as? BusinessSpecificPlugin {
+                print("   \(plugin.displayName) [\(businessPlugin.targetBusinessId)]: \(capabilityNames)")
+            } else {
+                print("   \(plugin.displayName): \(capabilityNames)")
+            }
         }
+        
+        print("\n🏢 业务方配置：")
+        let allBusinesses = ["edu_001", "content_001", "enterprise_001", "personal_001", "business_a", "business_b"]
+        for businessId in allBusinesses {
+            if let config = manager.getBusinessConfiguration(for: businessId) {
+                let capabilityCount = config.enabledCapabilities.count
+                let capabilityNames = config.enabledCapabilities.map { $0.displayName }.joined(separator: ", ")
+                print("   \(config.businessName): \(capabilityCount) 种能力")
+                print("      \(capabilityNames)")
+            }
+        }
+        
+        print("\n🎯 即时通信场景特色：")
+        print("   • 业务方A: 品牌化深度思考，带logo标识")
+        print("   • 业务方B: 知识库增强深度思考，连接专属知识库")
+        print("   • 插件竞争: 同一能力支持多个不同实现")
+        print("   • 业务隔离: 不同业务方的定制需求完全独立")
         
         print("\n✅ AI能力组合平台演示完成")
         print("=" * 50)

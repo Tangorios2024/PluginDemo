@@ -93,8 +93,8 @@ final class AICapabilityManager {
             throw AICapabilityError.unsupportedCapability(request.capabilityType)
         }
         
-        // 4. 选择第一个可用的插件（按优先级排序）
-        let selectedPlugin = availablePlugins[0]
+        // 4. 业务方特定的插件选择逻辑
+        let selectedPlugin = selectPluginForBusiness(plugins: availablePlugins, businessId: businessId, capabilityType: request.capabilityType)
         print("🔧 AICapabilityManager: 选择插件 \(selectedPlugin.pluginId) - \(selectedPlugin.displayName)")
         
         // 5. 验证输入参数
@@ -123,6 +123,38 @@ final class AICapabilityManager {
             print("   处理时间: \(String(format: "%.3f", processingTime))秒")
             throw error
         }
+    }
+    
+    // MARK: - 业务方特定的插件选择
+    
+    /// 根据业务方选择最合适的插件
+    private func selectPluginForBusiness(plugins: [AICapabilityPlugin], businessId: String, capabilityType: AICapabilityType) -> AICapabilityPlugin {
+        // 1. 优先选择业务方专用的插件
+        let businessSpecificPlugins = plugins.filter { plugin in
+            if let businessPlugin = plugin as? BusinessSpecificPlugin {
+                return businessPlugin.targetBusinessId == businessId
+            }
+            return false
+        }
+        
+        if let businessPlugin = businessSpecificPlugins.first {
+            print("🎯 AICapabilityManager: 选择业务方专用插件 \(businessPlugin.pluginId)")
+            return businessPlugin
+        }
+        
+        // 2. 如果没有业务方专用插件，选择通用插件
+        let genericPlugins = plugins.filter { plugin in
+            return !(plugin is BusinessSpecificPlugin)
+        }
+        
+        if let genericPlugin = genericPlugins.first {
+            print("🔧 AICapabilityManager: 选择通用插件 \(genericPlugin.pluginId)")
+            return genericPlugin
+        }
+        
+        // 3. 如果都没有，返回第一个可用插件
+        print("⚠️ AICapabilityManager: 未找到合适的插件，使用默认插件")
+        return plugins[0]
     }
     
     // MARK: - 能力发现
@@ -157,7 +189,14 @@ final class AICapabilityManager {
             // 办公场景
             [.ocr, .translation],
             [.webSearch, .deepThinking],
-            [.textSummary, .translation]
+            [.textSummary, .translation],
+            
+            // 即时通信场景
+            [.chatDialogue, .webSearch],
+            [.chatDialogue, .deepThinking],
+            [.documentAnalysis, .deepThinking],
+            [.chatDialogue, .documentAnalysis],
+            [.webSearch, .deepThinking, .textSummary]
         ]
         
         // 过滤出业务方可用的组合
