@@ -112,4 +112,6 @@ extension MainCoordinator: MainViewModelNavigationDelegate {
         let chatModuleVC = ChatModuleViewController()
         navigationController.pushViewController(chatModuleVC, animated: true)
     }
+    
+
 }

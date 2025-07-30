@@ -11,11 +11,16 @@ import Combine
 // MARK: - Chat ViewModel 协议
 
 /// Chat ViewModel 协议
+@preconcurrency
 protocol ChatViewModelProtocol: ObservableObject {
     var messages: [ChatMessage] { get }
     var isLoading: Bool { get }
     var currentConfiguration: ChatConfiguration? { get }
     var availableCapabilities: [ChatCapability] { get }
+    var thinkingChain: ThinkingChain? { get }
+    var knowledgeSearchResult: KnowledgeSearchResult? { get }
+    var showThinkingChain: Bool { get set }
+    var showKnowledgeSearch: Bool { get set }
     
     func sendMessage(_ message: String) async throws
     func getConversationHistory() -> [ChatMessage]
@@ -23,6 +28,10 @@ protocol ChatViewModelProtocol: ObservableObject {
     func updateConfiguration(_ config: ChatConfiguration)
     func switchBusiness(_ businessId: String)
     func getMockDataProvider() -> ChatMockDataProvider
+    func toggleThinkingChain()
+    func toggleKnowledgeSearch()
+    func generateThinkingChain(for message: String) async throws
+    func searchCustomKnowledgeBase(query: String) async throws
 }
 
 // MARK: - Chat Mock数据提供者协议
@@ -253,6 +262,33 @@ class BusinessBEnterpriseMockProvider: ChatMockDataProvider {
                 processingTime: 1.8,
                 confidence: 0.94
             )
+        case .thinkingChain:
+            return ChatResponse(
+                message: generateEnterpriseThinkingChainResponse(for: lowerMessage),
+                capabilities: [.thinkingChain],
+                metadata: [
+                    "business_type": "enterprise",
+                    "thinking_steps": 5,
+                    "confidence_level": "high",
+                    "security_level": "enterprise"
+                ],
+                processingTime: 3.2,
+                confidence: 0.97
+            )
+        case .customKnowledgeBase:
+            return ChatResponse(
+                message: generateEnterpriseCustomKnowledgeBaseResponse(for: lowerMessage),
+                capabilities: [.customKnowledgeBase],
+                metadata: [
+                    "business_type": "enterprise",
+                    "kb_documents": 12,
+                    "relevance_score": 0.94,
+                    "security_level": "enterprise",
+                    "custom_kb": true
+                ],
+                processingTime: 1.6,
+                confidence: 0.93
+            )
         default:
             return ChatResponse(
                 message: "BusinessB企业级智能助手为您服务！",
@@ -284,7 +320,9 @@ class BusinessBEnterpriseMockProvider: ChatMockDataProvider {
             .conversationHistory,
             .emotionAnalysis,
             .intentRecognition,
-            .contextMemory
+            .contextMemory,
+            .thinkingChain,
+            .customKnowledgeBase
         ]
     }
     
@@ -418,12 +456,94 @@ class BusinessBEnterpriseMockProvider: ChatMockDataProvider {
         📋 BusinessB - 智能总结，专业决策支持
         """
     }
+    
+    private func generateEnterpriseThinkingChainResponse(for message: String) -> String {
+        return """
+        🧠 BusinessB 企业级思考链路分析：
+        
+        基于您的问题，我进行了深度思考分析：
+        
+        🔍 思考步骤：
+        
+        步骤1 - 问题分析：
+        • 识别核心问题：\(message)
+        • 确定问题类型：企业级技术咨询
+        • 评估复杂度：高复杂度问题
+        
+        步骤2 - 信息收集：
+        • 技术背景调研
+        • 行业最佳实践分析
+        • 风险评估框架
+        
+        步骤3 - 方案设计：
+        • 多方案对比分析
+        • 技术可行性评估
+        • 成本效益分析
+        
+        步骤4 - 风险评估：
+        • 技术风险识别
+        • 安全合规检查
+        • 实施风险评估
+        
+        步骤5 - 结论形成：
+        • 推荐方案确定
+        • 实施路径规划
+        • 成功指标定义
+        
+        📊 思考链路统计：
+        • 分析步骤：5个
+        • 处理时间：3.2秒
+        • 置信度：97%
+        • 安全等级：企业级
+        
+        🧠 BusinessB - 深度思考，专业决策
+        """
+    }
+    
+    private func generateEnterpriseCustomKnowledgeBaseResponse(for message: String) -> String {
+        return """
+        📚 BusinessB 企业自定义知识库检索：
+        
+        基于您的查询，我从企业知识库中检索到以下信息：
+        
+        🔍 检索结果：
+        
+        文档1 - 企业架构设计指南
+        • 标题：微服务架构最佳实践
+        • 相关性：94%
+        • 内容：包含Spring Cloud、Docker、Kubernetes等企业级技术栈
+        
+        文档2 - 安全合规标准
+        • 标题：企业级安全架构设计
+        • 相关性：92%
+        • 内容：OAuth 2.0、JWT、RBAC等安全机制
+        
+        文档3 - 性能优化手册
+        • 标题：高可用系统性能优化
+        • 相关性：89%
+        • 内容：负载均衡、缓存策略、数据库优化
+        
+        文档4 - 合规性要求
+        • 标题：企业合规性检查清单
+        • 相关性：87%
+        • 内容：GDPR、SOX、ISO 27001等合规要求
+        
+        📊 知识库检索统计：
+        • 检索文档：12篇
+        • 平均相关性：94%
+        • 检索时间：1.6秒
+        • 知识库类型：企业自定义
+        
+        📚 BusinessB - 知识驱动，专业服务
+        """
+    }
 }
 
 // MARK: - Chat ViewModel 实现
 
 /// Chat ViewModel 主实现
 @MainActor
+@preconcurrency
 final class ChatViewModel: ChatViewModelProtocol {
     
     // MARK: - Published Properties
@@ -432,6 +552,10 @@ final class ChatViewModel: ChatViewModelProtocol {
     @Published var isLoading: Bool = false
     @Published var currentConfiguration: ChatConfiguration?
     @Published var availableCapabilities: [ChatCapability] = []
+    @Published var thinkingChain: ThinkingChain?
+    @Published var knowledgeSearchResult: KnowledgeSearchResult?
+    @Published var showThinkingChain: Bool = false
+    @Published var showKnowledgeSearch: Bool = false
     
     // MARK: - Private Properties
     
@@ -493,28 +617,40 @@ final class ChatViewModel: ChatViewModelProtocol {
     }
     
     func clearHistory() {
-        messages.removeAll()
+        DispatchQueue.main.async {
+            self.messages.removeAll()
+        }
     }
     
     func updateConfiguration(_ config: ChatConfiguration) {
-        currentConfiguration = config
-        availableCapabilities = config.enabledCapabilities
+        print("🔄 更新配置: \(config.businessName) (\(config.businessId))")
+        DispatchQueue.main.async {
+            print("✅ 在主线程更新配置: \(config.businessName)")
+            self.currentConfiguration = config
+            self.availableCapabilities = config.enabledCapabilities
+            // 立即发送UI更新通知
+            self.objectWillChange.send()
+        }
     }
     
     func switchBusiness(_ businessId: String) {
+        print("🔄 开始切换业务: \(businessId)")
         currentBusinessId = businessId
         
         // 切换Mock数据提供者
         switch businessId {
         case "business_a":
             mockDataProvider = BusinessACustomerServiceMockProvider()
+            print("✅ 切换到BusinessA Mock数据提供者")
         case "business_b":
             mockDataProvider = BusinessBEnterpriseMockProvider()
+            print("✅ 切换到BusinessB Mock数据提供者")
         default:
             mockDataProvider = BusinessACustomerServiceMockProvider()
+            print("⚠️ 使用默认Mock数据提供者")
         }
         
-        // 更新配置
+        // 更新配置（这会自动触发UI更新）
         updateConfigurationForBusiness(businessId)
         
         // 清空历史消息
@@ -597,7 +733,9 @@ final class ChatViewModel: ChatViewModelProtocol {
                     .conversationHistory,
                     .emotionAnalysis,
                     .intentRecognition,
-                    .contextMemory
+                    .contextMemory,
+                    .thinkingChain,
+                    .customKnowledgeBase
                 ],
                 capabilityOrder: [
                     .intentRecognition,
@@ -643,7 +781,9 @@ final class ChatViewModel: ChatViewModelProtocol {
     }
     
     private func loadConversationHistory() {
-        messages = mockDataProvider.getMockConversationHistory(businessId: currentBusinessId)
+        DispatchQueue.main.async {
+            self.messages = self.mockDataProvider.getMockConversationHistory(businessId: self.currentBusinessId)
+        }
     }
     
     private func processMessage(_ message: String) async throws -> ChatResponse {
@@ -666,4 +806,94 @@ final class ChatViewModel: ChatViewModelProtocol {
             )
         }
     }
-} 
+    
+    // MARK: - 思考链路功能
+    
+    func toggleThinkingChain() {
+        showThinkingChain.toggle()
+        if !showThinkingChain {
+            thinkingChain = nil
+        }
+    }
+    
+    func generateThinkingChain(for message: String) async throws {
+        isLoading = true
+        
+        // 模拟生成思考链路
+        let steps = [
+            ThinkingStep(stepNumber: 1, thinkingType: .analysis, content: "分析用户问题：\(message)", confidence: 0.95, reasoning: "识别问题类型和复杂度"),
+            ThinkingStep(stepNumber: 2, thinkingType: .reasoning, content: "收集相关信息", confidence: 0.92, reasoning: "从知识库和上下文获取相关信息"),
+            ThinkingStep(stepNumber: 3, thinkingType: .evaluation, content: "评估解决方案", confidence: 0.89, reasoning: "对比不同方案的优缺点"),
+            ThinkingStep(stepNumber: 4, thinkingType: .synthesis, content: "综合最佳方案", confidence: 0.94, reasoning: "整合信息形成推荐方案"),
+            ThinkingStep(stepNumber: 5, thinkingType: .conclusion, content: "形成最终结论", confidence: 0.97, reasoning: "基于分析提供专业建议")
+        ]
+        
+        let chain = ThinkingChain(
+            question: message,
+            steps: steps,
+            conclusion: "基于深度分析，为您提供专业的企业级解决方案",
+            processingTime: 3.2
+        )
+        
+        thinkingChain = chain
+        isLoading = false
+    }
+    
+    // MARK: - 自定义知识库功能
+    
+    func toggleKnowledgeSearch() {
+        showKnowledgeSearch.toggle()
+        if !showKnowledgeSearch {
+            knowledgeSearchResult = nil
+        }
+    }
+    
+    func searchCustomKnowledgeBase(query: String) async throws {
+        isLoading = true
+        
+        // 模拟知识库检索
+        let documents = [
+            KnowledgeDocument(
+                title: "企业微服务架构设计指南",
+                content: "包含Spring Cloud、Docker、Kubernetes等企业级技术栈的最佳实践",
+                category: "架构设计",
+                tags: ["微服务", "Spring Cloud", "Docker"],
+                relevanceScore: 0.94,
+                source: "企业知识库"
+            ),
+            KnowledgeDocument(
+                title: "企业级安全架构设计",
+                content: "OAuth 2.0、JWT、RBAC等安全机制的详细实现方案",
+                category: "安全合规",
+                tags: ["安全", "OAuth", "JWT"],
+                relevanceScore: 0.92,
+                source: "企业知识库"
+            ),
+            KnowledgeDocument(
+                title: "高可用系统性能优化",
+                content: "负载均衡、缓存策略、数据库优化等性能提升方案",
+                category: "性能优化",
+                tags: ["性能", "负载均衡", "缓存"],
+                relevanceScore: 0.89,
+                source: "企业知识库"
+            ),
+            KnowledgeDocument(
+                title: "企业合规性检查清单",
+                content: "GDPR、SOX、ISO 27001等合规要求的详细检查项",
+                category: "合规管理",
+                tags: ["合规", "GDPR", "SOX"],
+                relevanceScore: 0.87,
+                source: "企业知识库"
+            )
+        ]
+        
+        let result = KnowledgeSearchResult(
+            query: query,
+            documents: documents,
+            searchTime: 1.6
+        )
+        
+        knowledgeSearchResult = result
+        isLoading = false
+    }
+}

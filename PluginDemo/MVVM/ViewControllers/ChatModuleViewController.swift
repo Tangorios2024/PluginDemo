@@ -7,6 +7,7 @@
 
 import UIKit
 import Combine
+import Anchorage
 
 /// Chat模块演示页面
 /// 展示两个业务方的UI和逻辑差异
@@ -104,7 +105,7 @@ final class ChatModuleViewController: UIViewController {
     private lazy var configurationTextView: UITextView = {
         let textView = UITextView()
         textView.font = .systemFont(ofSize: 14)
-        textView.textColor = .label
+        textView.textColor = .secondaryLabel
         textView.backgroundColor = .systemGray6
         textView.layer.cornerRadius = 8
         textView.isEditable = false
@@ -113,23 +114,23 @@ final class ChatModuleViewController: UIViewController {
         return textView
     }()
     
-    // MARK: - Chat界面区域
+    // MARK: - Chat区域
     
     private lazy var chatContainerView: UIView = {
         let view = UIView()
         view.backgroundColor = .systemBackground
-        view.layer.cornerRadius = 12
+        view.layer.cornerRadius = 16
         view.layer.shadowColor = UIColor.black.cgColor
-        view.layer.shadowOffset = CGSize(width: 0, height: 2)
-        view.layer.shadowOpacity = 0.1
-        view.layer.shadowRadius = 4
+        view.layer.shadowOffset = CGSize(width: 0, height: 4)
+        view.layer.shadowOpacity = 0.15
+        view.layer.shadowRadius = 8
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
     
     private lazy var chatLabel: UILabel = {
         let label = UILabel()
-        label.text = "Chat对话"
+        label.text = "聊天对话"
         label.font = .systemFont(ofSize: 18, weight: .semibold)
         label.textColor = .label
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -138,12 +139,9 @@ final class ChatModuleViewController: UIViewController {
     
     private lazy var chatTableView: UITableView = {
         let tableView = UITableView()
-        tableView.delegate = self
-        tableView.dataSource = self
-        tableView.register(ChatMessageCell.self, forCellReuseIdentifier: "ChatMessageCell")
-        tableView.backgroundColor = .systemGray6
-        tableView.layer.cornerRadius = 8
+        tableView.backgroundColor = .clear
         tableView.separatorStyle = .none
+        tableView.showsVerticalScrollIndicator = false
         tableView.translatesAutoresizingMaskIntoConstraints = false
         return tableView
     }()
@@ -151,7 +149,9 @@ final class ChatModuleViewController: UIViewController {
     private lazy var inputContainerView: UIView = {
         let view = UIView()
         view.backgroundColor = .systemGray6
-        view.layer.cornerRadius = 20
+        view.layer.cornerRadius = 22
+        view.layer.borderWidth = 1
+        view.layer.borderColor = UIColor.systemGray4.cgColor
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
@@ -160,8 +160,8 @@ final class ChatModuleViewController: UIViewController {
         let textField = UITextField()
         textField.placeholder = "输入消息..."
         textField.font = .systemFont(ofSize: 16)
-        textField.borderStyle = .none
         textField.backgroundColor = .clear
+        textField.borderStyle = .none
         textField.translatesAutoresizingMaskIntoConstraints = false
         return textField
     }()
@@ -172,7 +172,7 @@ final class ChatModuleViewController: UIViewController {
         button.titleLabel?.font = .systemFont(ofSize: 16, weight: .semibold)
         button.backgroundColor = .systemBlue
         button.setTitleColor(.white, for: .normal)
-        button.layer.cornerRadius = 16
+        button.layer.cornerRadius = 18
         button.addTarget(self, action: #selector(sendMessage), for: .touchUpInside)
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
@@ -194,7 +194,7 @@ final class ChatModuleViewController: UIViewController {
     
     private lazy var capabilitiesLabel: UILabel = {
         let label = UILabel()
-        label.text = "AI能力按钮"
+        label.text = "AI能力"
         label.font = .systemFont(ofSize: 18, weight: .semibold)
         label.textColor = .label
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -204,10 +204,64 @@ final class ChatModuleViewController: UIViewController {
     private lazy var capabilitiesStackView: UIStackView = {
         let stackView = UIStackView()
         stackView.axis = .horizontal
+        stackView.spacing = 8
         stackView.distribution = .fillEqually
-        stackView.spacing = 12
         stackView.translatesAutoresizingMaskIntoConstraints = false
         return stackView
+    }()
+    
+    // MARK: - 企业级功能区域
+    
+    private lazy var enterpriseFeaturesView: UIView = {
+        let view = UIView()
+        view.backgroundColor = .systemBackground
+        view.layer.cornerRadius = 12
+        view.layer.shadowColor = UIColor.black.cgColor
+        view.layer.shadowOffset = CGSize(width: 0, height: 2)
+        view.layer.shadowOpacity = 0.1
+        view.layer.shadowRadius = 4
+        view.translatesAutoresizingMaskIntoConstraints = false
+        return view
+    }()
+    
+    private lazy var enterpriseFeaturesLabel: UILabel = {
+        let label = UILabel()
+        label.text = "企业级功能"
+        label.font = .systemFont(ofSize: 18, weight: .semibold)
+        label.textColor = .label
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
+    
+    private lazy var enterpriseFeaturesStackView: UIStackView = {
+        let stackView = UIStackView()
+        stackView.axis = .horizontal
+        stackView.spacing = 8
+        stackView.distribution = .fillEqually
+        stackView.translatesAutoresizingMaskIntoConstraints = false
+        return stackView
+    }()
+    
+    private lazy var thinkingChainButton: UIButton = {
+        let button = UIButton(type: .system)
+        button.setTitle("思考链路", for: .normal)
+        button.titleLabel?.font = .systemFont(ofSize: 14, weight: .medium)
+        button.backgroundColor = .systemPurple
+        button.setTitleColor(.white, for: .normal)
+        button.layer.cornerRadius = 8
+        button.addTarget(self, action: #selector(toggleThinkingChain), for: .touchUpInside)
+        return button
+    }()
+    
+    private lazy var customKnowledgeBaseButton: UIButton = {
+        let button = UIButton(type: .system)
+        button.setTitle("知识库", for: .normal)
+        button.titleLabel?.font = .systemFont(ofSize: 14, weight: .medium)
+        button.backgroundColor = .systemGreen
+        button.setTitleColor(.white, for: .normal)
+        button.layer.cornerRadius = 8
+        button.addTarget(self, action: #selector(toggleCustomKnowledgeBase), for: .touchUpInside)
+        return button
     }()
     
     // MARK: - Properties
@@ -241,6 +295,7 @@ final class ChatModuleViewController: UIViewController {
         contentView.addSubview(configurationView)
         contentView.addSubview(chatContainerView)
         contentView.addSubview(capabilitiesView)
+        contentView.addSubview(enterpriseFeaturesView)
         
         businessSwitchView.addSubview(businessSwitchLabel)
         businessSwitchView.addSubview(businessASegmentedControl)
@@ -258,107 +313,95 @@ final class ChatModuleViewController: UIViewController {
         capabilitiesView.addSubview(capabilitiesLabel)
         capabilitiesView.addSubview(capabilitiesStackView)
         
+        enterpriseFeaturesView.addSubview(enterpriseFeaturesLabel)
+        enterpriseFeaturesView.addSubview(enterpriseFeaturesStackView)
+        enterpriseFeaturesStackView.addArrangedSubview(thinkingChainButton)
+        enterpriseFeaturesStackView.addArrangedSubview(customKnowledgeBaseButton)
+        
         setupConstraints()
         setupCapabilityButtons()
+        setupTableView()
     }
     
     private func setupConstraints() {
-        NSLayoutConstraint.activate([
-            // ScrollView
-            scrollView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
-            scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            scrollView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
-            
-            // ContentView
-            contentView.topAnchor.constraint(equalTo: scrollView.topAnchor),
-            contentView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor),
-            contentView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor),
-            contentView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor),
-            contentView.widthAnchor.constraint(equalTo: scrollView.widthAnchor),
-            
-            // Title
-            titleLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 20),
-            titleLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
-            titleLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20),
-            
-            // Subtitle
-            subtitleLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 8),
-            subtitleLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
-            subtitleLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20),
-            
-            // Business Switch
-            businessSwitchView.topAnchor.constraint(equalTo: subtitleLabel.bottomAnchor, constant: 20),
-            businessSwitchView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
-            businessSwitchView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20),
-            businessSwitchView.heightAnchor.constraint(equalToConstant: 80),
-            
-            businessSwitchLabel.topAnchor.constraint(equalTo: businessSwitchView.topAnchor, constant: 16),
-            businessSwitchLabel.leadingAnchor.constraint(equalTo: businessSwitchView.leadingAnchor, constant: 16),
-            
-            businessASegmentedControl.topAnchor.constraint(equalTo: businessSwitchLabel.bottomAnchor, constant: 12),
-            businessASegmentedControl.leadingAnchor.constraint(equalTo: businessSwitchView.leadingAnchor, constant: 16),
-            businessASegmentedControl.trailingAnchor.constraint(equalTo: businessSwitchView.trailingAnchor, constant: -16),
-            businessASegmentedControl.heightAnchor.constraint(equalToConstant: 32),
-            
-            // Configuration
-            configurationView.topAnchor.constraint(equalTo: businessSwitchView.bottomAnchor, constant: 20),
-            configurationView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
-            configurationView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20),
-            configurationView.heightAnchor.constraint(equalToConstant: 200),
-            
-            configurationLabel.topAnchor.constraint(equalTo: configurationView.topAnchor, constant: 16),
-            configurationLabel.leadingAnchor.constraint(equalTo: configurationView.leadingAnchor, constant: 16),
-            
-            configurationTextView.topAnchor.constraint(equalTo: configurationLabel.bottomAnchor, constant: 12),
-            configurationTextView.leadingAnchor.constraint(equalTo: configurationView.leadingAnchor, constant: 16),
-            configurationTextView.trailingAnchor.constraint(equalTo: configurationView.trailingAnchor, constant: -16),
-            configurationTextView.bottomAnchor.constraint(equalTo: configurationView.bottomAnchor, constant: -16),
-            
-            // Chat Container
-            chatContainerView.topAnchor.constraint(equalTo: configurationView.bottomAnchor, constant: 20),
-            chatContainerView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
-            chatContainerView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20),
-            chatContainerView.heightAnchor.constraint(equalToConstant: 400),
-            
-            chatLabel.topAnchor.constraint(equalTo: chatContainerView.topAnchor, constant: 16),
-            chatLabel.leadingAnchor.constraint(equalTo: chatContainerView.leadingAnchor, constant: 16),
-            
-            chatTableView.topAnchor.constraint(equalTo: chatLabel.bottomAnchor, constant: 12),
-            chatTableView.leadingAnchor.constraint(equalTo: chatContainerView.leadingAnchor, constant: 16),
-            chatTableView.trailingAnchor.constraint(equalTo: chatContainerView.trailingAnchor, constant: -16),
-            chatTableView.heightAnchor.constraint(equalToConstant: 280),
-            
-            inputContainerView.topAnchor.constraint(equalTo: chatTableView.bottomAnchor, constant: 12),
-            inputContainerView.leadingAnchor.constraint(equalTo: chatContainerView.leadingAnchor, constant: 16),
-            inputContainerView.trailingAnchor.constraint(equalTo: chatContainerView.trailingAnchor, constant: -16),
-            inputContainerView.heightAnchor.constraint(equalToConstant: 44),
-            
-            messageTextField.leadingAnchor.constraint(equalTo: inputContainerView.leadingAnchor, constant: 12),
-            messageTextField.topAnchor.constraint(equalTo: inputContainerView.topAnchor, constant: 8),
-            messageTextField.bottomAnchor.constraint(equalTo: inputContainerView.bottomAnchor, constant: -8),
-            messageTextField.trailingAnchor.constraint(equalTo: sendButton.leadingAnchor, constant: -8),
-            
-            sendButton.trailingAnchor.constraint(equalTo: inputContainerView.trailingAnchor, constant: -8),
-            sendButton.topAnchor.constraint(equalTo: inputContainerView.topAnchor, constant: 6),
-            sendButton.bottomAnchor.constraint(equalTo: inputContainerView.bottomAnchor, constant: -6),
-            sendButton.widthAnchor.constraint(equalToConstant: 60),
-            
-            // Capabilities
-            capabilitiesView.topAnchor.constraint(equalTo: chatContainerView.bottomAnchor, constant: 20),
-            capabilitiesView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
-            capabilitiesView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20),
-            capabilitiesView.heightAnchor.constraint(equalToConstant: 120),
-            capabilitiesView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -20),
-            
-            capabilitiesLabel.topAnchor.constraint(equalTo: capabilitiesView.topAnchor, constant: 16),
-            capabilitiesLabel.leadingAnchor.constraint(equalTo: capabilitiesView.leadingAnchor, constant: 16),
-            
-            capabilitiesStackView.topAnchor.constraint(equalTo: capabilitiesLabel.bottomAnchor, constant: 12),
-            capabilitiesStackView.leadingAnchor.constraint(equalTo: capabilitiesView.leadingAnchor, constant: 16),
-            capabilitiesStackView.trailingAnchor.constraint(equalTo: capabilitiesView.trailingAnchor, constant: -16),
-            capabilitiesStackView.heightAnchor.constraint(equalToConstant: 40)
-        ])
+        // 使用Anchorage设置约束
+        scrollView.edgeAnchors == view.safeAreaLayoutGuide.edgeAnchors
+        
+        contentView.edgeAnchors == scrollView.edgeAnchors
+        contentView.widthAnchor == scrollView.widthAnchor
+        
+        titleLabel.topAnchor == contentView.topAnchor + 20
+        titleLabel.horizontalAnchors == contentView.horizontalAnchors + 20
+        
+        subtitleLabel.topAnchor == titleLabel.bottomAnchor + 8
+        subtitleLabel.horizontalAnchors == contentView.horizontalAnchors + 20
+        
+        businessSwitchView.topAnchor == subtitleLabel.bottomAnchor + 20
+        businessSwitchView.horizontalAnchors == contentView.horizontalAnchors + 20
+        businessSwitchView.heightAnchor == 80
+        
+        businessSwitchLabel.topAnchor == businessSwitchView.topAnchor + 16
+        businessSwitchLabel.leadingAnchor == businessSwitchView.leadingAnchor + 16
+        
+        businessASegmentedControl.topAnchor == businessSwitchLabel.bottomAnchor + 12
+        businessASegmentedControl.horizontalAnchors == businessSwitchView.horizontalAnchors + 16
+        businessASegmentedControl.heightAnchor == 32
+        
+        configurationView.topAnchor == businessSwitchView.bottomAnchor + 20
+        configurationView.horizontalAnchors == contentView.horizontalAnchors + 20
+        configurationView.heightAnchor == 200
+        
+        configurationLabel.topAnchor == configurationView.topAnchor + 16
+        configurationLabel.leadingAnchor == configurationView.leadingAnchor + 16
+        
+        configurationTextView.topAnchor == configurationLabel.bottomAnchor + 12
+        configurationTextView.edgeAnchors == configurationView.edgeAnchors + 16
+        
+        chatContainerView.topAnchor == configurationView.bottomAnchor + 20
+        chatContainerView.horizontalAnchors == contentView.horizontalAnchors + 20
+        chatContainerView.heightAnchor == 400
+        
+        chatLabel.topAnchor == chatContainerView.topAnchor + 16
+        chatLabel.leadingAnchor == chatContainerView.leadingAnchor + 16
+        
+        chatTableView.topAnchor == chatLabel.bottomAnchor + 12
+        chatTableView.horizontalAnchors == chatContainerView.horizontalAnchors + 16
+        chatTableView.heightAnchor == 280
+        
+        inputContainerView.topAnchor == chatTableView.bottomAnchor + 12
+        inputContainerView.horizontalAnchors == chatContainerView.horizontalAnchors + 16
+        inputContainerView.heightAnchor == 44
+        
+        messageTextField.leadingAnchor == inputContainerView.leadingAnchor + 12
+        messageTextField.verticalAnchors == inputContainerView.verticalAnchors + 8
+        messageTextField.trailingAnchor == sendButton.leadingAnchor - 8
+        
+        sendButton.trailingAnchor == inputContainerView.trailingAnchor - 8
+        sendButton.verticalAnchors == inputContainerView.verticalAnchors + 6
+        sendButton.widthAnchor == 60
+        
+        capabilitiesView.topAnchor == chatContainerView.bottomAnchor + 20
+        capabilitiesView.horizontalAnchors == contentView.horizontalAnchors + 20
+        capabilitiesView.heightAnchor == 120
+        
+        capabilitiesLabel.topAnchor == capabilitiesView.topAnchor + 16
+        capabilitiesLabel.leadingAnchor == capabilitiesView.leadingAnchor + 16
+        
+        capabilitiesStackView.topAnchor == capabilitiesLabel.bottomAnchor + 12
+        capabilitiesStackView.horizontalAnchors == capabilitiesView.horizontalAnchors + 16
+        capabilitiesStackView.heightAnchor == 40
+        
+        enterpriseFeaturesView.topAnchor == capabilitiesView.bottomAnchor + 20
+        enterpriseFeaturesView.horizontalAnchors == contentView.horizontalAnchors + 20
+        enterpriseFeaturesView.heightAnchor == 100
+        enterpriseFeaturesView.bottomAnchor == contentView.bottomAnchor - 20
+        
+        enterpriseFeaturesLabel.topAnchor == enterpriseFeaturesView.topAnchor + 16
+        enterpriseFeaturesLabel.leadingAnchor == enterpriseFeaturesView.leadingAnchor + 16
+        
+        enterpriseFeaturesStackView.topAnchor == enterpriseFeaturesLabel.bottomAnchor + 12
+        enterpriseFeaturesStackView.horizontalAnchors == enterpriseFeaturesView.horizontalAnchors + 16
+        enterpriseFeaturesStackView.heightAnchor == 40
     }
     
     private func setupCapabilityButtons() {
@@ -382,6 +425,12 @@ final class ChatModuleViewController: UIViewController {
         return button
     }
     
+    private func setupTableView() {
+        chatTableView.delegate = self
+        chatTableView.dataSource = self
+        chatTableView.register(ChatMessageCell.self, forCellReuseIdentifier: "ChatMessageCell")
+    }
+    
     private func setupViewModel() {
         viewModel = ChatViewModel(businessId: "business_a")
     }
@@ -401,12 +450,7 @@ final class ChatModuleViewController: UIViewController {
             .receive(on: DispatchQueue.main)
             .sink { [weak self] isLoading in
                 self?.sendButton.isEnabled = !isLoading
-                self?.messageTextField.isEnabled = !isLoading
-                if isLoading {
-                    self?.sendButton.setTitle("发送中...", for: .normal)
-                } else {
-                    self?.sendButton.setTitle("发送", for: .normal)
-                }
+                self?.sendButton.setTitle(isLoading ? "发送中..." : "发送", for: .normal)
             }
             .store(in: &cancellables)
         
@@ -449,15 +493,53 @@ final class ChatModuleViewController: UIViewController {
         sendMessage()
     }
     
+    @objc private func toggleThinkingChain() {
+        viewModel.toggleThinkingChain()
+        
+        if viewModel.showThinkingChain {
+            // 生成思考链路
+            Task {
+                do {
+                    let currentMessage = messageTextField.text ?? "请分析当前对话内容"
+                    try await viewModel.generateThinkingChain(for: currentMessage)
+                    showThinkingChainAlert()
+                } catch {
+                    showErrorAlert(message: "生成思考链路失败：\(error.localizedDescription)")
+                }
+            }
+        }
+    }
+    
+    @objc private func toggleCustomKnowledgeBase() {
+        viewModel.toggleKnowledgeSearch()
+        
+        if viewModel.showKnowledgeSearch {
+            // 搜索自定义知识库
+            Task {
+                do {
+                    let query = messageTextField.text ?? "企业架构设计"
+                    try await viewModel.searchCustomKnowledgeBase(query: query)
+                    showKnowledgeSearchAlert()
+                } catch {
+                    showErrorAlert(message: "知识库检索失败：\(error.localizedDescription)")
+                }
+            }
+        }
+    }
+    
     // MARK: - UI Updates
     
     private func updateUIForBusiness(_ businessId: String) {
         if businessId == "business_a" {
             // BusinessA - 客户友好风格
             updateUIForCustomerStyle()
+            // 隐藏企业级功能
+            enterpriseFeaturesView.isHidden = true
         } else {
             // BusinessB - 企业专业风格
             updateUIForEnterpriseStyle()
+            // 显示企业级功能
+            enterpriseFeaturesView.isHidden = false
         }
     }
     
@@ -492,7 +574,7 @@ final class ChatModuleViewController: UIViewController {
     }
     
     private func updateUIForEnterpriseStyle() {
-        // 直角、单色、淡入淡出
+        // 直角、简洁、淡入淡出
         chatContainerView.layer.cornerRadius = 4
         inputContainerView.layer.cornerRadius = 4
         
@@ -504,10 +586,10 @@ final class ChatModuleViewController: UIViewController {
         sendButton.layer.cornerRadius = 4
         
         // 动画效果
-        UIView.animate(withDuration: 0.5) {
+        UIView.animate(withDuration: 0.3, delay: 0, options: [.curveEaseInOut], animations: {
             self.chatContainerView.alpha = 0.8
-        } completion: { _ in
-            UIView.animate(withDuration: 0.3) {
+        }) { _ in
+            UIView.animate(withDuration: 0.2) {
                 self.chatContainerView.alpha = 1.0
             }
         }
@@ -520,27 +602,28 @@ final class ChatModuleViewController: UIViewController {
         }
         
         let configText = """
-        业务方: \(config.businessName)
+        业务名称: \(config.businessName)
         业务ID: \(config.businessId)
         
-        🎨 UI定制化:
-        • 主题: \(config.uiCustomization.theme)
-        • 按钮样式: \(config.uiCustomization.buttonStyle)
-        • 动画类型: \(config.uiCustomization.animationType)
-        • 圆角半径: \(config.uiCustomization.borderRadius)
-        • 阴影效果: \(config.uiCustomization.shadowEnabled ? "启用" : "禁用")
+        启用能力:
+        \(config.enabledCapabilities.map { "- \($0.displayName)" }.joined(separator: "\n"))
         
-        🔧 逻辑定制化:
-        • 响应策略: \(config.logicCustomization.responseStrategy)
-        • 重试次数: \(config.logicCustomization.retryCount)
-        • 超时时间: \(config.logicCustomization.timeoutInterval)秒
-        • 回退机制: \(config.logicCustomization.fallbackEnabled ? "启用" : "禁用")
+        能力优先级:
+        \(config.capabilityOrder.map { "- \($0.displayName)" }.joined(separator: "\n"))
         
-        🚀 启用能力:
-        \(config.enabledCapabilities.map { "• \($0.displayName): \($0.description)" }.joined(separator: "\n"))
+        响应延迟: \(config.responseDelay)秒
+        Mock数据: \(config.mockDataEnabled ? "启用" : "禁用")
         
-        📋 能力执行顺序:
-        \(config.capabilityOrder.map { "\($0.displayName)" }.joined(separator: " → "))
+        UI定制:
+        - 主题: \(config.uiCustomization.theme)
+        - 按钮样式: \(config.uiCustomization.buttonStyle)
+        - 动画类型: \(config.uiCustomization.animationType)
+        - 圆角: \(config.uiCustomization.borderRadius)
+        
+        逻辑定制:
+        - 响应策略: \(config.logicCustomization.responseStrategy)
+        - 重试次数: \(config.logicCustomization.retryCount)
+        - 超时时间: \(config.logicCustomization.timeoutInterval)秒
         """
         
         configurationTextView.text = configText
@@ -548,16 +631,57 @@ final class ChatModuleViewController: UIViewController {
     
     private func scrollToBottom() {
         guard !viewModel.messages.isEmpty else { return }
-        let lastRow = viewModel.messages.count - 1
-        let indexPath = IndexPath(row: lastRow, section: 0)
-        chatTableView.scrollToRow(at: indexPath, at: .bottom, animated: true)
+        let lastIndex = IndexPath(row: viewModel.messages.count - 1, section: 0)
+        chatTableView.scrollToRow(at: lastIndex, at: .bottom, animated: true)
+    }
+    
+    // MARK: - Alerts
+    
+    private func showThinkingChainAlert() {
+        guard let thinkingChain = viewModel.thinkingChain else { return }
+        
+        let alert = UIAlertController(title: "思考链路", message: nil, preferredStyle: .alert)
+        
+        var message = ""
+        for step in thinkingChain.steps {
+            message += "步骤\(step.stepNumber): \(step.content)\n"
+            message += "置信度: \(step.confidence)\n"
+            message += "推理: \(step.reasoning)\n\n"
+        }
+        
+        alert.message = message
+        alert.addAction(UIAlertAction(title: "确定", style: .default))
+        present(alert, animated: true)
+    }
+    
+    private func showKnowledgeSearchAlert() {
+        guard let result = viewModel.knowledgeSearchResult else { return }
+        
+        let alert = UIAlertController(title: "知识库检索结果", message: nil, preferredStyle: .alert)
+        
+        var message = "查询: \(result.query)\n\n"
+        message += "相关文档:\n"
+        for (index, doc) in result.documents.enumerated() {
+            message += "\(index + 1). \(doc.title)\n"
+            message += "   相关性: \(doc.relevanceScore)\n"
+            message += "   内容: \(doc.content)\n\n"
+        }
+        
+        alert.message = message
+        alert.addAction(UIAlertAction(title: "确定", style: .default))
+        present(alert, animated: true)
+    }
+    
+    private func showErrorAlert(message: String) {
+        let alert = UIAlertController(title: "错误", message: message, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "确定", style: .default))
+        present(alert, animated: true)
     }
 }
 
 // MARK: - UITableViewDataSource & UITableViewDelegate
 
 extension ChatModuleViewController: UITableViewDataSource, UITableViewDelegate {
-    
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return viewModel.messages.count
     }
@@ -576,8 +700,13 @@ extension ChatModuleViewController: UITableViewDataSource, UITableViewDelegate {
 
 // MARK: - ChatMessageCell
 
-/// Chat消息单元格
-final class ChatMessageCell: UITableViewCell {
+class ChatMessageCell: UITableViewCell {
+    private lazy var bubbleView: UIView = {
+        let view = UIView()
+        view.layer.cornerRadius = 16
+        view.translatesAutoresizingMaskIntoConstraints = false
+        return view
+    }()
     
     private lazy var messageLabel: UILabel = {
         let label = UILabel()
@@ -585,13 +714,6 @@ final class ChatMessageCell: UITableViewCell {
         label.font = .systemFont(ofSize: 16)
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
-    }()
-    
-    private lazy var bubbleView: UIView = {
-        let view = UIView()
-        view.layer.cornerRadius = 12
-        view.translatesAutoresizingMaskIntoConstraints = false
-        return view
     }()
     
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
@@ -610,17 +732,9 @@ final class ChatMessageCell: UITableViewCell {
         contentView.addSubview(bubbleView)
         bubbleView.addSubview(messageLabel)
         
-        NSLayoutConstraint.activate([
-            bubbleView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 8),
-            bubbleView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -8),
-            bubbleView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
-            bubbleView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
-            
-            messageLabel.topAnchor.constraint(equalTo: bubbleView.topAnchor, constant: 12),
-            messageLabel.leadingAnchor.constraint(equalTo: bubbleView.leadingAnchor, constant: 12),
-            messageLabel.trailingAnchor.constraint(equalTo: bubbleView.trailingAnchor, constant: -12),
-            messageLabel.bottomAnchor.constraint(equalTo: bubbleView.bottomAnchor, constant: -12)
-        ])
+        // 使用Anchorage设置约束
+        bubbleView.edgeAnchors == contentView.edgeAnchors + UIEdgeInsets(top: 8, left: 16, bottom: 8, right: 16)
+        messageLabel.edgeAnchors == bubbleView.edgeAnchors + UIEdgeInsets(top: 12, left: 12, bottom: 12, right: 12)
     }
     
     func configure(with message: ChatMessage) {
@@ -636,9 +750,9 @@ final class ChatMessageCell: UITableViewCell {
             messageLabel.textColor = .label
             bubbleView.layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner, .layerMaxXMaxYCorner]
         case .system:
-            bubbleView.backgroundColor = .systemYellow
+            bubbleView.backgroundColor = .systemOrange.withAlphaComponent(0.2)
             messageLabel.textColor = .label
             bubbleView.layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner, .layerMinXMaxYCorner, .layerMaxXMaxYCorner]
         }
     }
-} 
+}

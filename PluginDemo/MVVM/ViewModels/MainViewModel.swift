@@ -194,4 +194,6 @@ final class MainViewModel: MainViewModelProtocol {
         // 通知导航代理进行页面跳转
         navigationDelegate?.navigateToChatModule()
     }
+    
+
 }

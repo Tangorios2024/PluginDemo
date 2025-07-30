@@ -193,4 +193,6 @@ final class MainViewController: UIViewController {
     @objc private func chatModuleButtonTapped() {
         viewModel.chatModuleButtonTapped(viewController: self)
     }
+    
+
 } 

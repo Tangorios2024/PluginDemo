@@ -19,6 +19,8 @@ enum ChatCapability: String, CaseIterable, Codable {
     case emotionAnalysis = "情感分析"
     case intentRecognition = "意图识别"
     case contextMemory = "上下文记忆"
+    case thinkingChain = "思考链路"
+    case customKnowledgeBase = "自定义知识库"
     
     var displayName: String {
         return self.rawValue
@@ -42,6 +44,10 @@ enum ChatCapability: String, CaseIterable, Codable {
             return "识别用户意图"
         case .contextMemory:
             return "保持对话上下文记忆"
+        case .thinkingChain:
+            return "展示AI思考链路和推理过程"
+        case .customKnowledgeBase:
+            return "使用企业自定义知识库进行内容检索"
         }
     }
 }
@@ -267,4 +273,98 @@ enum ChatError: Error, LocalizedError {
             return "操作超时: \(operation)"
         }
     }
-} 
+}
+
+// MARK: - 思考链路相关数据结构
+
+/// 思考步骤结构
+struct ThinkingStep: Codable {
+    let stepId: String
+    let stepNumber: Int
+    let thinkingType: ThinkingType
+    let content: String
+    let confidence: Double
+    let reasoning: String
+    let timestamp: Date
+    
+    enum ThinkingType: String, Codable {
+        case analysis = "分析"
+        case reasoning = "推理"
+        case evaluation = "评估"
+        case synthesis = "综合"
+        case conclusion = "结论"
+    }
+    
+    init(stepNumber: Int, thinkingType: ThinkingType, content: String, confidence: Double = 1.0, reasoning: String = "") {
+        self.stepId = UUID().uuidString
+        self.stepNumber = stepNumber
+        self.thinkingType = thinkingType
+        self.content = content
+        self.confidence = confidence
+        self.reasoning = reasoning
+        self.timestamp = Date()
+    }
+}
+
+/// 思考链路结构
+struct ThinkingChain: Codable {
+    let chainId: String
+    let question: String
+    let steps: [ThinkingStep]
+    let totalSteps: Int
+    let overallConfidence: Double
+    let processingTime: TimeInterval
+    let conclusion: String
+    
+    init(question: String, steps: [ThinkingStep], conclusion: String, processingTime: TimeInterval = 0.0) {
+        self.chainId = UUID().uuidString
+        self.question = question
+        self.steps = steps
+        self.totalSteps = steps.count
+        self.overallConfidence = steps.isEmpty ? 0.0 : steps.map { $0.confidence }.reduce(0, +) / Double(steps.count)
+        self.processingTime = processingTime
+        self.conclusion = conclusion
+    }
+}
+
+// MARK: - 自定义知识库相关数据结构
+
+/// 知识库文档结构
+struct KnowledgeDocument: Codable {
+    let documentId: String
+    let title: String
+    let content: String
+    let category: String
+    let tags: [String]
+    let relevanceScore: Double
+    let lastUpdated: Date
+    let source: String
+    
+    init(title: String, content: String, category: String, tags: [String] = [], relevanceScore: Double = 0.0, source: String = "") {
+        self.documentId = UUID().uuidString
+        self.title = title
+        self.content = content
+        self.category = category
+        self.tags = tags
+        self.relevanceScore = relevanceScore
+        self.lastUpdated = Date()
+        self.source = source
+    }
+}
+
+/// 知识库检索结果
+struct KnowledgeSearchResult: Codable {
+    let query: String
+    let documents: [KnowledgeDocument]
+    let totalResults: Int
+    let searchTime: TimeInterval
+    let confidence: Double
+    
+    init(query: String, documents: [KnowledgeDocument], searchTime: TimeInterval = 0.0) {
+        self.query = query
+        self.documents = documents
+        self.totalResults = documents.count
+        self.searchTime = searchTime
+        self.confidence = documents.isEmpty ? 0.0 : documents.map { $0.relevanceScore }.reduce(0, +) / Double(documents.count)
+    }
+}
