@@ -39,6 +39,14 @@ func deepThinkingButtonButtonTapped(viewController: UIViewController)
 /// Chat模块架构演示按钮点击
 func chatModuleButtonTapped(viewController: UIViewController)
 
+/// 豆包爱学数学学习演示按钮点击
+func douBaoMathButtonTapped(viewController: UIViewController)
+
+/// 豆包爱学学习路径演示按钮点击
+func douBaoLearningPathButtonTapped(viewController: UIViewController)
+
+/// 豆包爱学AI辅导演示按钮点击
+func douBaoTutoringButtonTapped(viewController: UIViewController)
 
 }
 
@@ -50,6 +58,9 @@ protocol MainViewModelNavigationDelegate: AnyObject {
     func navigateToEducationScenario()
     func navigateToFeedbackScenario()
     func navigateToDeepThinkingButton()
-func navigateToChatModule()
+    func navigateToChatModule()
+    func navigateToDouBaoMath()
+    func navigateToDouBaoLearningPath()
+    func navigateToDouBaoTutoring()
 
 }

@@ -195,5 +195,67 @@ final class MainViewModel: MainViewModelProtocol {
         navigationDelegate?.navigateToChatModule()
     }
     
+    func douBaoMathButtonTapped(viewController: UIViewController) {
+        // 追踪按钮点击
+        tracker.track(.tapButton(identifier: "doubao_math_demo"),
+                     from: viewController,
+                     userId: currentUserId)
+        
+        // 追踪豆包爱学数学学习演示事件
+        let properties: [String: Any] = [
+            "demo_type": "doubao_math_learning",
+            "scenarios": ["dynamic_learning_path", "feedback_driven_optimization", "adaptive_learning"],
+            "source": "main_screen",
+            "feature": "doubao_math_demo"
+        ]
+        tracker.track(.custom(name: "doubao_math_demo_started", properties: properties),
+                     from: viewController,
+                     userId: currentUserId)
+        
+        // 通知导航代理进行页面跳转
+        navigationDelegate?.navigateToDouBaoMath()
+    }
+    
+    func douBaoLearningPathButtonTapped(viewController: UIViewController) {
+        // 追踪按钮点击
+        tracker.track(.tapButton(identifier: "doubao_learning_path_demo"),
+                     from: viewController,
+                     userId: currentUserId)
+        
+        // 追踪豆包爱学学习路径演示事件
+        let properties: [String: Any] = [
+            "demo_type": "doubao_learning_path",
+            "scenarios": ["personalized_path_planning", "learning_style_analysis", "content_recommendation"],
+            "source": "main_screen",
+            "feature": "doubao_learning_path_demo"
+        ]
+        tracker.track(.custom(name: "doubao_learning_path_demo_started", properties: properties),
+                     from: viewController,
+                     userId: currentUserId)
+        
+        // 通知导航代理进行页面跳转
+        navigationDelegate?.navigateToDouBaoLearningPath()
+    }
+    
+    func douBaoTutoringButtonTapped(viewController: UIViewController) {
+        // 追踪按钮点击
+        tracker.track(.tapButton(identifier: "doubao_tutoring_demo"),
+                     from: viewController,
+                     userId: currentUserId)
+        
+        // 追踪豆包爱学AI辅导演示事件
+        let properties: [String: Any] = [
+            "demo_type": "doubao_ai_tutoring",
+            "scenarios": ["one_on_one_tutoring", "real_time_interaction", "learning_insights"],
+            "source": "main_screen",
+            "feature": "doubao_tutoring_demo"
+        ]
+        tracker.track(.custom(name: "doubao_tutoring_demo_started", properties: properties),
+                     from: viewController,
+                     userId: currentUserId)
+        
+        // 通知导航代理进行页面跳转
+        navigationDelegate?.navigateToDouBaoTutoring()
+    }
 
 }

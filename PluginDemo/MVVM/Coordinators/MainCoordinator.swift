@@ -113,5 +113,24 @@ extension MainCoordinator: MainViewModelNavigationDelegate {
         navigationController.pushViewController(chatModuleVC, animated: true)
     }
     
+    @MainActor
+    func navigateToDouBaoMath() {
+        let douBaoMathVC = DouBaoMathDemoViewController()
+        navigationController.pushViewController(douBaoMathVC, animated: true)
+    }
+    
+    @MainActor
+    func navigateToDouBaoLearningPath() {
+        let viewModel = DouBaoLearningPathViewModel(mockDataProvider: DouBaoMockDataProviderImpl())
+        let douBaoLearningPathVC = DouBaoLearningPathDemoViewController(viewModel: viewModel)
+        navigationController.pushViewController(douBaoLearningPathVC, animated: true)
+    }
+    
+    @MainActor
+    func navigateToDouBaoTutoring() {
+        let viewModel = DouBaoTutoringViewModel(mockDataProvider: DouBaoMockDataProviderImpl())
+        let douBaoTutoringVC = DouBaoTutoringDemoViewController(viewModel: viewModel)
+        navigationController.pushViewController(douBaoTutoringVC, animated: true)
+    }
 
 }

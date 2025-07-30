@@ -116,7 +116,7 @@ final class BusinessACustomerDeepThinkingPlugin: BusinessSpecificPlugin {
                 "knowledge_base_access": false,
                 "response_time": "1.1s",
                 "customer_features": ["friendly_ui", "quick_response", "simple_analysis"],
-                "button_design": businessSpecificConfig["button_design"],
+                "button_design": businessSpecificConfig["button_design"] as Any,
                 "analysis_depth": "customer_friendly",
                 "brand_logo_included": true
             ]
@@ -264,7 +264,7 @@ final class BusinessBEnterpriseDeepThinkingPlugin: BusinessSpecificPlugin {
                 "knowledge_base_access": true,
                 "response_time": "1.8s",
                 "enterprise_features": ["professional_ui", "secure_analysis", "knowledge_enhanced"],
-                "button_design": businessSpecificConfig["button_design"],
+                "button_design": businessSpecificConfig["button_design"] as Any,
                 "knowledge_base_connected": true,
                 "documents_found": 12,
                 "best_practices": 5,

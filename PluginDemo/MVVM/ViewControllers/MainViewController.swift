@@ -138,7 +138,10 @@ final class MainViewController: UIViewController {
             createButton(title: "智慧教育场景演示", action: #selector(educationScenarioButtonTapped)),
             createButton(title: "反馈收集场景演示", action: #selector(feedbackScenarioButtonTapped)),
             createButton(title: "深度思考按钮演示", action: #selector(deepThinkingButtonTapped)),
-            createButton(title: "Chat模块架构演示", action: #selector(chatModuleButtonTapped))
+            createButton(title: "Chat模块架构演示", action: #selector(chatModuleButtonTapped)),
+            createButton(title: "豆包爱学数学学习演示", action: #selector(douBaoMathButtonTapped)),
+            createButton(title: "豆包爱学学习路径演示", action: #selector(douBaoLearningPathButtonTapped)),
+            createButton(title: "豆包爱学AI辅导演示", action: #selector(douBaoTutoringButtonTapped))
         ]
         
         buttons.forEach { stackView.addArrangedSubview($0) }
@@ -194,5 +197,16 @@ final class MainViewController: UIViewController {
         viewModel.chatModuleButtonTapped(viewController: self)
     }
     
+    @objc private func douBaoMathButtonTapped() {
+        viewModel.douBaoMathButtonTapped(viewController: self)
+    }
+    
+    @objc private func douBaoLearningPathButtonTapped() {
+        viewModel.douBaoLearningPathButtonTapped(viewController: self)
+    }
+    
+    @objc private func douBaoTutoringButtonTapped() {
+        viewModel.douBaoTutoringButtonTapped(viewController: self)
+    }
 
 } 
