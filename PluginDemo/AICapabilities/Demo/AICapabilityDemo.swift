@@ -23,7 +23,16 @@ final class AICapabilityDemo {
         
         // 新增：即时通信场景演示
         await ChatScenarioDemo.runChatScenarios()
-
+        
+        // 运行反馈收集场景演示
+        await FeedbackScenarioDemo.runFeedbackScenarios()
+        
+                // 新增：深度思考按钮场景演示
+        await DeepThinkingButtonDemo.runDeepThinkingButtonScenarios()
+        
+        // 新增：Chat模块架构演示
+        await ChatModuleDemo.runChatModuleScenarios()
+        
         await demo.demonstrateCapabilityCombinations()
         demo.showStatistics()
     }
@@ -50,10 +59,24 @@ final class AICapabilityDemo {
         manager.register(plugin: AdvancedTTSPlugin()) // 高优先级TTS插件
         
         // 新增聊天相关插件
-        manager.register(plugin: ChatCapabilityPlugin())
+        manager.register(plugin: ChatDialoguePlugin())
         manager.register(plugin: BusinessADeepThinkingPlugin()) // 业务方A专用深度思考
         manager.register(plugin: BusinessBDeepThinkingPlugin()) // 业务方B专用深度思考
         manager.register(plugin: DocumentAnalysisPlugin())
+        
+        // 新增深度思考按钮专用插件
+        manager.register(plugin: BusinessACustomerDeepThinkingPlugin()) // 业务方A客户UI深度思考
+        manager.register(plugin: BusinessBEnterpriseDeepThinkingPlugin()) // 业务方B企业UI深度思考
+        
+        // 新增Chat模块相关插件
+        manager.register(plugin: GeneralChatPlugin()) // 通用Chat插件
+        manager.register(plugin: BusinessACustomerServiceChatPlugin()) // 业务方A智能客服Chat
+        manager.register(plugin: BusinessBEnterpriseChatPlugin()) // 业务方B企业级Chat
+        
+        // 新增反馈收集相关插件
+        manager.register(plugin: FeedbackCollectionPlugin())
+        manager.register(plugin: BusinessAFeedbackPlugin()) // 业务方A专用反馈收集
+        manager.register(plugin: BusinessBFeedbackPlugin()) // 业务方B专用反馈收集
         
         // 注册不同业务方配置
         print("\n🏢 注册业务方配置...")

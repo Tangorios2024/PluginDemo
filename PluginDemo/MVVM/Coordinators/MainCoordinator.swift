@@ -97,4 +97,19 @@ extension MainCoordinator: MainViewModelNavigationDelegate {
         let educationVC = EducationScenarioDemoViewController()
         navigationController.pushViewController(educationVC, animated: true)
     }
+
+    func navigateToFeedbackScenario() {
+        let feedbackVC = FeedbackScenarioDemoViewController()
+        navigationController.pushViewController(feedbackVC, animated: true)
+    }
+
+    func navigateToDeepThinkingButton() {
+        let deepThinkingVC = DeepThinkingButtonViewController()
+        navigationController.pushViewController(deepThinkingVC, animated: true)
+    }
+    
+    func navigateToChatModule() {
+        let chatModuleVC = ChatModuleViewController()
+        navigationController.pushViewController(chatModuleVC, animated: true)
+    }
 }

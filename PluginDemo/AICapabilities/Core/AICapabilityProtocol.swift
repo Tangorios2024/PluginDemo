@@ -63,13 +63,16 @@ enum AICapabilityType: String, CaseIterable {
     case userProfiling = "user_profiling"                     // 用户画像
     case contentRecommendation = "content_recommendation"     // 内容推荐
     case tts = "tts"                                          // 文本转语音
-    case dialogueInteraction = "dialogue_interaction"         // 对话交互
-    case storyGeneration = "story_generation"                 // 故事生成
-    
-    // 即时通信场景新增能力
-    case chatDialogue = "chat_dialogue"                       // 聊天对话
-    case documentAnalysis = "document_analysis"               // 文档分析
-    case knowledgeBaseQuery = "knowledge_base_query"          // 知识库查询
+                case dialogueInteraction = "dialogue_interaction"         // 对话交互
+            case storyGeneration = "story_generation"                 // 故事生成
+            
+            // 即时通信场景新增能力
+            case chatDialogue = "chat_dialogue"                       // 聊天对话
+            case documentAnalysis = "document_analysis"               // 文档分析
+            case knowledgeBaseQuery = "knowledge_base_query"          // 知识库查询
+            
+            // 反馈收集场景新增能力
+            case feedbackCollection = "feedback_collection"           // 反馈收集
     
     var displayName: String {
         switch self {
@@ -87,11 +90,12 @@ enum AICapabilityType: String, CaseIterable {
         case .userProfiling: return "用户画像"
         case .contentRecommendation: return "内容推荐"
         case .tts: return "文本转语音"
-        case .dialogueInteraction: return "对话交互"
-        case .storyGeneration: return "故事生成"
-        case .chatDialogue: return "聊天对话"
-        case .documentAnalysis: return "文档分析"
-        case .knowledgeBaseQuery: return "知识库查询"
+                        case .dialogueInteraction: return "对话交互"
+                case .storyGeneration: return "故事生成"
+            case .chatDialogue: return "聊天对话"
+            case .documentAnalysis: return "文档分析"
+            case .knowledgeBaseQuery: return "知识库查询"
+            case .feedbackCollection: return "反馈收集"
         }
     }
 }

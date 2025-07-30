@@ -73,7 +73,7 @@ final class ChatScenarioDemo {
         print("-" * 40)
         
         // 注册聊天相关插件
-        manager.register(plugin: ChatCapabilityPlugin())
+        manager.register(plugin: ChatDialoguePlugin())
         print("   ✅ 注册基础聊天插件 - 支持智能对话")
         
         manager.register(plugin: NetworkCapabilityPlugin()) // webSearch

@@ -8,7 +8,7 @@
 import Foundation
 
 /// 聊天对话能力插件 - 支持基础聊天对话功能
-final class ChatCapabilityPlugin: AICapabilityPlugin {
+final class ChatDialoguePlugin: AICapabilityPlugin {
     
     let pluginId: String = "com.ai.chat"
     let displayName: String = "聊天对话引擎"

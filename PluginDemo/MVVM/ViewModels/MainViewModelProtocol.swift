@@ -29,6 +29,15 @@ protocol MainViewModelProtocol {
 
     /// 智慧教育场景按钮点击
     func educationScenarioButtonTapped(viewController: UIViewController)
+
+    /// 反馈收集场景按钮点击
+    func feedbackScenarioButtonTapped(viewController: UIViewController)
+
+    /// 深度思考按钮展示按钮点击
+func deepThinkingButtonButtonTapped(viewController: UIViewController)
+
+/// Chat模块架构演示按钮点击
+func chatModuleButtonTapped(viewController: UIViewController)
 }
 
 /// MainViewModel 导航代理协议
@@ -37,4 +46,7 @@ protocol MainViewModelNavigationDelegate: AnyObject {
     func navigateToLLMDemo()
     func navigateToAICapabilityDemo()
     func navigateToEducationScenario()
+    func navigateToFeedbackScenario()
+    func navigateToDeepThinkingButton()
+func navigateToChatModule()
 }

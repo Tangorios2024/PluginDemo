@@ -17,11 +17,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
         // 在后台运行插件架构演示
         Task {
-            // 运行快速测试验证功能
-            await AICapabilityTest.runQuickTest()
-
             // 运行完整演示
-            await AICapabilityDemo.runCompleteDemo()
+//            await AICapabilityDemo.runCompleteDemo()
         }
 
         return true

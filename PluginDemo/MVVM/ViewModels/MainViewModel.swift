@@ -131,4 +131,67 @@ final class MainViewModel: MainViewModelProtocol {
         // 通知导航代理进行页面跳转
         navigationDelegate?.navigateToEducationScenario()
     }
+
+    func feedbackScenarioButtonTapped(viewController: UIViewController) {
+        // 追踪按钮点击
+        tracker.track(.tapButton(identifier: "feedback_scenario_button"),
+                     from: viewController,
+                     userId: currentUserId)
+
+        // 追踪反馈收集场景演示事件
+        let properties: [String: Any] = [
+            "demo_type": "feedback_scenario",
+            "scenarios": ["enterprise_feedback", "technical_feedback"],
+            "source": "main_screen",
+            "feature": "feedback_demo"
+        ]
+        tracker.track(.custom(name: "feedback_scenario_demo_started", properties: properties),
+                     from: viewController,
+                     userId: currentUserId)
+
+        // 通知导航代理进行页面跳转
+        navigationDelegate?.navigateToFeedbackScenario()
+    }
+
+    func deepThinkingButtonButtonTapped(viewController: UIViewController) {
+        // 追踪按钮点击
+        tracker.track(.tapButton(identifier: "deep_thinking_button_demo"),
+                     from: viewController,
+                     userId: currentUserId)
+
+        // 追踪深度思考按钮演示事件
+        let properties: [String: Any] = [
+            "demo_type": "deep_thinking_button",
+            "scenarios": ["customer_ui", "enterprise_ui"],
+            "source": "main_screen",
+            "feature": "deep_thinking_demo"
+        ]
+        tracker.track(.custom(name: "deep_thinking_button_demo_started", properties: properties),
+                     from: viewController,
+                     userId: currentUserId)
+
+        // 通知导航代理进行页面跳转
+        navigationDelegate?.navigateToDeepThinkingButton()
+    }
+    
+    func chatModuleButtonTapped(viewController: UIViewController) {
+        // 追踪按钮点击
+        tracker.track(.tapButton(identifier: "chat_module_demo"),
+                     from: viewController,
+                     userId: currentUserId)
+        
+        // 追踪Chat模块演示事件
+        let properties: [String: Any] = [
+            "demo_type": "chat_module_architecture",
+            "scenarios": ["business_abstraction", "solid_principles", "mock_driven"],
+            "source": "main_screen",
+            "feature": "chat_module_demo"
+        ]
+        tracker.track(.custom(name: "chat_module_demo_started", properties: properties),
+                     from: viewController,
+                     userId: currentUserId)
+        
+        // 通知导航代理进行页面跳转
+        navigationDelegate?.navigateToChatModule()
+    }
 }
